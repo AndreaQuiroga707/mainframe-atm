@@ -70,3 +70,32 @@ mvn clean install
 ```
 mvn exec:java -Dexec.mainClass="bo.edu.ucb.sis213.App"
 ```
+
+## Instalación de la Base de Datos
+
+1. Hacer correr una instancia MySQL en docker
+
+```
+docker run --name mysql-atm -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:8
+```
+
+2. Me conecto a la BBDD (Le pedira password es 123456)
+
+```
+docker exec -it mysql-atm mysql -u root -p
+
+```
+
+3. Creamos la Base de Datos del ATM.
+
+```
+CREATE DATABASE atm;
+```
+
+4. Creamos la Base de Datos del ATM.
+
+```
+use atm;
+```
+
+5. Ejecutan el script init.sql de la carpeta database.
