@@ -99,3 +99,16 @@ use atm;
 ```
 
 5. Ejecutan el script init.sql de la carpeta database.
+
+
+-Para iniciar el contenedor:
+
+sudo docker start mysql-atm
+
+-Para detener el contenedor:
+
+sudo docker stop mysql-atm
+
+-Acceder a la instancia de MySQL dentro del contenedor:
+
+sudo docker exec -it mysql-atm mysql -u root -p
