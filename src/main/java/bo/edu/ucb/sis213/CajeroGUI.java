@@ -11,8 +11,6 @@ public class CajeroGUI extends JFrame {
     private JTextField usuarioField;
     private JPasswordField pinField;
     private JButton ingresarButton;
-    private CajeroAutomatico cajero;
-    private JFrame frame;
     private Usuario usuarioAutenticado;
     private Connection connection;
 
@@ -46,19 +44,22 @@ public class CajeroGUI extends JFrame {
         ingresarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String usuario = usuarioField.getText();
+                var usuario = usuarioField.getText();
                 char[] pinChars = pinField.getPassword();
                 int pin = Integer.parseInt(new String(pinChars));
 
                 Login.Ingresar(usuario, pin, intentosRestantes);
 
-                //usuarioAutenticado = Login.getUsuarioActual();
-
                 if (Login.getUsuarioActual() != null) {
                     usuarioAutenticado = Login.getUsuarioActual();
-                    System.out.println("Consultar Saldo"+ usuarioAutenticado);
+                    //copilot how can i show a joptionpane saying welcome name user help me please
+                    JOptionPane.showMessageDialog(CajeroGUI.this,
+                            "Bienvenid@ " + usuarioAutenticado.getNombre() + ".",
+                            "Inicio de sesión exitoso", JOptionPane.INFORMATION_MESSAGE);
+
+                    //System.out.println("Usuario autenticado"+ usuarioAutenticado);
                     dispose(); // Cerrar la ventana de inicio de sesión
-                    //new CajeroGUI(cajero); 
+                    
                     new CajeroGUI(usuarioAutenticado, connection); 
 
                 } else {

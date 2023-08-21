@@ -135,13 +135,6 @@ public class App {
                 Connection connection = getConnection();
                 //System.out.println("Conexión a la base de datos establecida correctamente.");
 
-                // Insertar en la tabla de depósito
-                /*String depositoQuery = "INSERT INTO deposito (usuario_id, cantidad) VALUES (?, ?)";
-                PreparedStatement depositoStatement = connection.prepareStatement(depositoQuery);
-                depositoStatement.setInt(1, usuarioId);
-                depositoStatement.setDouble(2, cantidad);
-                depositoStatement.executeUpdate();*/
-    
                 // Insertar en la tabla de historico
                 String historicoQuery = "INSERT INTO historico (usuario_id, tipo_operacion, cantidad) VALUES (?, ?, ?)";
                 PreparedStatement historicoStatement = connection.prepareStatement(historicoQuery);
@@ -183,14 +176,7 @@ public class App {
         } else {
             try {
                 Connection connection = getConnection();
-    
-                /*// Insertar en la tabla de retiro
-                String retiroQuery = "INSERT INTO retiro (usuario_id, cantidad) VALUES (?, ?)";
-                PreparedStatement retiroStatement = connection.prepareStatement(retiroQuery);
-                retiroStatement.setInt(1, usuarioId);
-                retiroStatement.setDouble(2, cantidad);
-                retiroStatement.executeUpdate(); */
-    
+       
                 // Insertar en la tabla de historico
                 String historicoQuery = "INSERT INTO historico (usuario_id, tipo_operacion, cantidad) VALUES (?, ?, ?)";
                 PreparedStatement historicoStatement = connection.prepareStatement(historicoQuery);

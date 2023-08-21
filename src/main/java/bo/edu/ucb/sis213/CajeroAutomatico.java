@@ -2,9 +2,7 @@ package bo.edu.ucb.sis213;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -16,7 +14,7 @@ public class CajeroAutomatico {
         try {
             connection = BaseDeDatos.getConnection(); // Obtener la conexión de la clase BaseDeDatos
 
-            CajeroAutomatico cajero = new CajeroAutomatico();
+            //CajeroAutomatico cajero = new CajeroAutomatico();
 
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -31,20 +29,18 @@ public class CajeroAutomatico {
         }
         
         
-        CajeroGUI cajeroGUI = new CajeroGUI(usuario,connection);
+        //CajeroGUI cajeroGUI = new CajeroGUI(usuario,connection);
         
     }
 
-    
-    
     public static void consultarSaldo(Usuario usuario, Connection connection) {
         if (usuario != null) {
-            System.out.println("Su saldo actual es: $" + usuario.getSaldo());
+            JOptionPane.showMessageDialog(null, "Su saldo actual es: $" + usuario.getSaldo());
         } else {
-            System.out.println("Debe autenticarse para consultar el saldo.");
+            JOptionPane.showMessageDialog(null, "Debe autenticarse para consultar el saldo.");
         }
     }
-
+    
     public static void realizarDeposito(Usuario usuario, Connection connection) {
         if (connection == null) {
             try {
@@ -99,14 +95,14 @@ public class CajeroAutomatico {
                 return; // Salir del método si no se puede obtener la conexión
             }
         }
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese la cantidad a retirar: $");
-        double cantidad = scanner.nextDouble();
-    
+        String cantidadStr = JOptionPane.showInputDialog("Ingrese la cantidad a retirar: $");
+        double cantidad = Double.parseDouble(cantidadStr);
+       
         if (cantidad <= 0) {
-            System.out.println("Cantidad no válida.");
+            JOptionPane.showMessageDialog(null, "Cantidad no válida.");
+
         } else if (cantidad > usuario.getSaldo()) {
-            System.out.println("Saldo insuficiente.");
+            JOptionPane.showMessageDialog(null, "Saldo insuficiente.");
         } else {
             usuario.actualizarSaldo(-cantidad); // Restar la cantidad al saldo
             try {
@@ -121,10 +117,10 @@ public class CajeroAutomatico {
                     actualizarSaldoStatement.executeUpdate();
                 }
     
-                System.out.println("Retiro realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
+                JOptionPane.showMessageDialog(null, "Retiro realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.out.println("Error al realizar el retiro.");
+                JOptionPane.showMessageDialog(null, "Error al realizar el retiro.");
             }
         }
     }
@@ -135,21 +131,20 @@ public class CajeroAutomatico {
                 connection = BaseDeDatos.getConnection(); // Volver a obtener la conexión si es nula
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.out.println("Error al conectar con la base de datos.");
+                JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos.");
                 return; // Salir del método si no se puede obtener la conexión
             }
         }
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese su PIN actual: ");
-        int pinIngresado = scanner.nextInt();
-    
+        String pinIngresadoStr = JOptionPane.showInputDialog("Ingrese su PIN actual: ");
+        int pinIngresado = Integer.parseInt(pinIngresadoStr);
+      
         if (pinIngresado == usuario.getPin()) {
             try {
-                System.out.print("Ingrese su nuevo PIN: ");
-                int nuevoPin = scanner.nextInt();
-                System.out.print("Confirme su nuevo PIN: ");
-                int confirmacionPin = scanner.nextInt();
-    
+                String nuevoPinStr = JOptionPane.showInputDialog("Ingrese su nuevo PIN: ");
+                int nuevoPin = Integer.parseInt(nuevoPinStr);
+                String confirmacionPinStr = JOptionPane.showInputDialog("Confirme su nuevo PIN: ");
+                int confirmacionPin = Integer.parseInt(confirmacionPinStr);
+         
                 if (nuevoPin == confirmacionPin) {
                     usuario.cambiarPIN(nuevoPin);
     
@@ -161,16 +156,18 @@ public class CajeroAutomatico {
                         actualizarPinStatement.executeUpdate();
                     }
     
-                    System.out.println("PIN actualizado con éxito.");
-                } else {
-                    System.out.println("Los PINs no coinciden.");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Error al cambiar el PIN.");
+                    JOptionPane.showMessageDialog(null, "PIN actualizado con éxito.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Los PINs no coinciden.");
             }
-        } else {
-            System.out.println("PIN incorrecto.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese un PIN válido.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al cambiar el PIN.");
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "PIN incorrecto.");
         }
     }
     
