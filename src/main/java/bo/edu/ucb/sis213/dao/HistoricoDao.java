@@ -1,15 +1,15 @@
-package bo.edu.ucb.sis213;
+package bo.edu.ucb.sis213.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class Operacion {
+public class HistoricoDao {
     private int usuarioId;
     private String tipoOperacion;
     private double cantidad;
 
-    public Operacion(int usuarioId, String tipoOperacion, double cantidad) {
+    public HistoricoDao(int usuarioId, String tipoOperacion, double cantidad) {
         this.usuarioId = usuarioId;
         this.tipoOperacion = tipoOperacion;
         this.cantidad = cantidad;

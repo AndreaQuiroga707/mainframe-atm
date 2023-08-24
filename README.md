@@ -46,7 +46,12 @@ Desarrollar un programa interactivo en línea de comandos que simule las operaci
 7. **Salir**:
     * Mostrar un mensaje de despedida y cerrar el programa.
 
+##Arquitectura de la aplicación
 
+El software tiene una arquitectura de 3 capas:
+- view: Capa de presentación, en este es una aplicacion swing. Todas las clases que tienen componentes Swing estan en este paquete.
+-bl: Capa de logica de negocio, en este caso es una aplicacion Java. Todas las clases que tienen la logica de negocio estan en este paquete.
+-dao: Capa de acceso a datos, en este caso es una aplicacion Java. Todas las clases que tienen acceso a datos estan en este paquete.
 
 ## Requerimientos
 
@@ -62,15 +67,18 @@ Se recomienda utilizar sdkman (Linux)
 Para compilar el proyecto
 
 ```
-mvn clean install
+sudo mvn clean install
 ```
 
 ## Ejecución
 
 ```
-mvn exec:java -Dexec.mainClass="bo.edu.ucb.sis213.App"
+mvn exec:java -Dexec.mainClass="bo.edu.ucb.sis213.ATMApp"
 ```
 
+```
+//mvn exec:java -Dexec.mainClass="bo.edu.ucb.sis213.CajeroGUI"
+```
 ## Instalación de la Base de Datos
 
 1. Hacer correr una instancia MySQL en docker

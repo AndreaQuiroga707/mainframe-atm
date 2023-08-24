@@ -1,9 +1,11 @@
-package bo.edu.ucb.sis213;
+package bo.edu.ucb.sis213.bl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import bo.edu.ucb.sis213.dao.BaseDeDatos;
 
 public class Login {
 
