@@ -1,53 +1,32 @@
 package bo.edu.ucb.sis213.bl;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import bo.edu.ucb.sis213.bl.util.ATMException;
+import bo.edu.ucb.sis213.bl.util.SinIntentosException;
 import bo.edu.ucb.sis213.dao.BaseDeDatos;
 import bo.edu.ucb.sis213.dao.HistoricoDao;
-import bo.edu.ucb.sis213.view.CajeroGUI;
 import bo.edu.ucb.sis213.dao.UsuarioDao;  
 
 public class AppBl {
     private static Connection connection;
     static UsuarioDao usuarioDao = new UsuarioDao(connection);
 
-    public static void main(String[] args) {
-        try {
-            connection = BaseDeDatos.getConnection(); // Obtener la conexión de la clase BaseDeDatos
-
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    CajeroGUI loginGUI = new CajeroGUI(connection);//conectoin
-                    loginGUI.setVisible(true);
-                }
-            });
-         
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Error al conectar con la base de datos.");
-        }
-    }
-    
-    public static void consultarSaldo(Usuario usuario) {
-        
+    public static void consultarSaldo(UsuarioBl usuario) throws ATMException, SQLException {
         try {
             usuarioDao.consultarSaldo(usuario);
-            JOptionPane.showMessageDialog(null, "Su saldo actual es: $" + usuario.getSaldo());
+            //JOptionPane.showMessageDialog(null, "Su saldo es: $" + usuario.getSaldo());
         } catch (ATMException e) {
-            JOptionPane.showMessageDialog(null, "Error al consultar el saldo: " + e.getMessage());
+            throw new ATMException("Error al consultar el saldo: " + e.getMessage());
         }
     }
     
-    public static void realizarDeposito(Usuario usuario, double cantidad) throws ATMException, SQLException {
-    System.out.println(cantidad+"cantidaaaad");
-        if (cantidad <= 0) {
+    public static void realizarDeposito(UsuarioBl usuario, BigDecimal cantidad) throws ATMException, SQLException {
+    System.out.println(cantidad+"cantidad");
+        //if (cantidad <= 0) {
+        if (cantidad.compareTo(BigDecimal.ZERO) <= 0) {
             //JOptionPane.showMessageDialog(null, "Cantidad no válida.");
             throw new ATMException("Cantidad no válida.");
         } else {
@@ -58,47 +37,57 @@ public class AppBl {
             UsuarioDao depositDao = new UsuarioDao(BaseDeDatos.getConnection());
             depositDao.realizarDeposito(usuario, cantidad);
 
-            JOptionPane.showMessageDialog(null, "Depósito realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
+            //JOptionPane.showMessageDialog(null, "Depósito realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
          }   
     }  
     
-    public static void realizarRetiro(Usuario usuario, double cantidad) throws ATMException, SQLException {
-    //System.out.println(cantidad+"cantidaaaad");
-        if (cantidad <= 0) {
+    public static void realizarRetiro(UsuarioBl usuario, BigDecimal cantidad) throws ATMException, SQLException {
+   
+        //if (cantidad <= 0) {
+        if (cantidad.compareTo(BigDecimal.ZERO) <= 0) {
             //JOptionPane.showMessageDialog(null, "Cantidad no válida.");
             throw new ATMException("Cantidad no válida.");
         } else {
-            usuario.actualizarSaldo(-cantidad);
+            usuario.actualizarSaldo(cantidad.negate());//resta
             HistoricoDao operacion = new HistoricoDao(usuario.getId(), "retiro", cantidad);
             operacion.guardarEnHistorico(BaseDeDatos.getConnection());
             
             UsuarioDao retUsuarioDao = new UsuarioDao(BaseDeDatos.getConnection());
             retUsuarioDao.realizarRetiro(usuario, cantidad);
 
-            JOptionPane.showMessageDialog(null, "Retiro realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
-         }   
+            //JOptionPane.showMessageDialog(null, "Retiro realizado con éxito. Su nuevo saldo es: $" + usuario.getSaldo());
+        }   
     }  
     
     
-    public static void cambiarPINLogic(Usuario usuario, int nuevoPin, Connection connection) throws SQLException {
+    public static void cambiarPINLogic(UsuarioBl usuario, int pinActual, int nuevoPin1, int nuevoPin2, Connection connection) throws SQLException, ATMException {
+        if (nuevoPin1 != nuevoPin2) {
+            throw new ATMException("Los PINs no coinciden");
+        }
+        if (nuevoPin1 == pinActual) {
+            throw new ATMException("El nuevo PIN no puede ser igual al actual");
+        }
+        if (usuario.getPin() != pinActual) {
+            throw new ATMException("El PIN actual no es correcto");
+        }
+        if (nuevoPin1 < 1000 || nuevoPin1 > 9999) {
+            throw new ATMException("El PIN debe ser de 4 dígitos");
+        }
+        
         UsuarioDao usuarioDao = new UsuarioDao(connection);
-        usuarioDao.cambiarPIN(usuario, nuevoPin);
+        usuarioDao.cambiarPIN(usuario, nuevoPin2);
+        usuario.cambiarPIN(nuevoPin2);
     }
 
-    public Usuario ingresar(String aliasIngresado, int pinIngresado, int intentos) {
-        Usuario usuarioActual = null;
-        while (intentos > 0) {
-            usuarioActual = usuarioDao.validarPIN(aliasIngresado, pinIngresado);
-            if (usuarioActual != null) {
-                break;
-            } else {
-                intentos--;
-            }
+    public UsuarioBl ingresar(String aliasIngresado, int pinIngresado, int intentos) throws Exception{
+        if(intentos == 0){
+            throw new SinIntentosException("No tiene más intentos");
         }
+        UsuarioBl usuarioActual = null;
+        usuarioActual = usuarioDao.validarPIN(aliasIngresado, pinIngresado);
+
         return usuarioActual;
-    }
-    
-    
+    }    
 }
     
     

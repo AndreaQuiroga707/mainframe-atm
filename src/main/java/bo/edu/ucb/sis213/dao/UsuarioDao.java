@@ -1,25 +1,24 @@
 package bo.edu.ucb.sis213.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-
-import bo.edu.ucb.sis213.bl.Usuario;
+import bo.edu.ucb.sis213.bl.UsuarioBl;
 import bo.edu.ucb.sis213.bl.util.ATMException;
 
 public class UsuarioDao {
 
-    public static Usuario usuario;
+    public static UsuarioBl usuario;
     public Connection connection;
 
     public UsuarioDao(Connection connection) {
         this.connection = connection;
     }
 
-    public double consultarSaldo(Usuario usuario) throws ATMException {
+    public double consultarSaldo(UsuarioBl usuario) throws ATMException {
         Connection connectionAux = null;
         try {
             connectionAux = BaseDeDatos.getConnection();
@@ -52,7 +51,7 @@ public class UsuarioDao {
 }
 
 
-    public void realizarDeposito(Usuario usuario, double cantidad) throws ATMException {
+    public void realizarDeposito(UsuarioBl usuario, BigDecimal cantidad) throws ATMException {
         if (connection == null) {
             throw new ATMException("No se puede conectar a la base de datos.");
         }
@@ -61,7 +60,7 @@ public class UsuarioDao {
             // Realizar la operación de depósito en la base de datos
             String actualizarSaldoQuery = "UPDATE usuarios SET saldo = saldo + ? WHERE id = ?";
             try (PreparedStatement actualizarSaldoStatement = connection.prepareStatement(actualizarSaldoQuery)) {
-                actualizarSaldoStatement.setDouble(1, cantidad);
+                actualizarSaldoStatement.setBigDecimal(1, cantidad);
                 actualizarSaldoStatement.setInt(2, usuario.getId());
                 actualizarSaldoStatement.executeUpdate();
             }
@@ -73,7 +72,7 @@ public class UsuarioDao {
         }
     }
 
-    public void realizarRetiro(Usuario usuario, double cantidad) throws ATMException {
+    public void realizarRetiro(UsuarioBl usuario, BigDecimal cantidad) throws ATMException {
         if (connection == null) {
             throw new ATMException("No se puede conectar a la base de datos.");
         }
@@ -81,7 +80,7 @@ public class UsuarioDao {
             // Realizar la operación de retiro en la base de datos
             String actualizarSaldoQuery = "UPDATE usuarios SET saldo = saldo - ? WHERE id = ?";
             try (PreparedStatement actualizarSaldoStatement = connection.prepareStatement(actualizarSaldoQuery)) {
-                actualizarSaldoStatement.setDouble(1, cantidad);
+                actualizarSaldoStatement.setBigDecimal(1, cantidad);
                 actualizarSaldoStatement.setInt(2, usuario.getId());
                 actualizarSaldoStatement.executeUpdate();
             }
@@ -92,20 +91,19 @@ public class UsuarioDao {
         }
     }
  
-    public void cambiarPIN(Usuario usuario, int nuevoPin) throws SQLException {
-        if (connection == null) {
-            throw new SQLException("No se puede conectar a la base de datos.");
-        }
+    public void cambiarPIN(UsuarioBl usuario, int nuevoPin) throws SQLException {
+        Connection connection2 = BaseDeDatos.getConnection();
 
         String actualizarPinQuery = "UPDATE usuarios SET pin = ? WHERE id = ?";
-        try (PreparedStatement actualizarPinStatement = connection.prepareStatement(actualizarPinQuery)) {
+        try (PreparedStatement actualizarPinStatement = connection2.prepareStatement(actualizarPinQuery)) {
             actualizarPinStatement.setInt(1, nuevoPin);
             actualizarPinStatement.setInt(2, usuario.getId());
             actualizarPinStatement.executeUpdate();
+
         }
     }
 
-    public Usuario validarPIN(String alias, int pin) {
+    public UsuarioBl validarPIN(String alias, int pin) throws ATMException {
         String query = "SELECT id, nombre, saldo, alias FROM usuarios WHERE alias = ? AND pin = ?";
         try {
             Connection connection2 = BaseDeDatos.getConnection();
@@ -117,13 +115,16 @@ public class UsuarioDao {
             if (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String nombre = resultSet.getString("nombre");
-                double saldo = resultSet.getDouble("saldo");
-                return new Usuario(id, nombre, pin, saldo, alias);
+                BigDecimal saldo = resultSet.getBigDecimal("saldo");
+                return new UsuarioBl(id, nombre, pin, saldo, alias);
+            }else{
+                throw new ATMException("Usuario o PIN incorrecto.");
             }
-        } catch (Exception e) {
+            }catch (Exception e) {
             e.printStackTrace();
+            throw new ATMException("Error al validar el PIN.");
         }
-        return null; // Si el usuario o el PIN son inválidos
+        //return null; // Si el usuario o el PIN son inválidos
     }
     
 }

@@ -9,7 +9,7 @@ import bo.edu.ucb.sis213.dao.BaseDeDatos;
 import bo.edu.ucb.sis213.view.CajeroGUI;
 
 public class ATMApp {
-        public static void main(String[] args) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
